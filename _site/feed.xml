@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>white</title>
+    <description>我想成为我心目中的极客</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Wed, 30 Aug 2017 14:00:59 +0800</pubDate>
+    <lastBuildDate>Wed, 30 Aug 2017 14:00:59 +0800</lastBuildDate>
+    <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>Hello word 2017!</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;“Yeah It’s on. ”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;hello-world&quot;&gt;Hello World！&lt;/h2&gt;
+
+&lt;p&gt;千呼万唤始出来，
+2017 年，陈杨总算有个地方可以好好写点东西了。&lt;/p&gt;
+
+&lt;p&gt;回顾过去，从静态页面到PHP，从php到cms系统再到现在的githubPage+jekyll，从windows都不会到linux git提交，从小学，到大学，历时这么多年，现在终于有一个稳定的Blog了，真的不容易啊，期间也自己写过php cms博客系统，也用过其他博客，不过，始终觉得“作为一个程序员， Blog 这种轮子要是挂在大众博客程序上就太没意思了。一是觉得大部分 Blog 服务都太丑，二是觉得不能随便定制不好玩。”————Hux&lt;/p&gt;
+
+&lt;p&gt;后面准备把以前很多笔记，经验都迁移过来，慢慢更新下去, 希望成为我心目中的极客!&lt;/p&gt;
+</description>
+        <pubDate>Mon, 28 Aug 2017 15:03:26 +0800</pubDate>
+        <link>http://localhost:4000/jekyll/update/2017/08/28/hello/</link>
+        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2017/08/28/hello/</guid>
+        
+        <category>生活</category>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+  </channel>
+</rss>

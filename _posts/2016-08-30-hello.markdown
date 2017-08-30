@@ -1,0 +1,25 @@
+---
+layout: post
+title:  "Hello word 2017!"
+date:   2017-08-28 15:03:26 +0800
+author:     "陈杨"
+header-img: "img/post-bg-2015.jpg"
+categories: jekyll update
+catalog: true
+tags:
+    - 生活
+---
+
+> “Yeah It's on. ”
+
+
+## Hello World！
+
+千呼万唤始出来，
+2017 年，陈杨总算有个地方可以好好写点东西了。
+
+
+回顾过去，从静态页面到PHP，从php到cms系统再到现在的githubPage+jekyll，从windows都不会到linux git提交，从小学，到大学，历时这么多年，现在终于有一个稳定的Blog了，真的不容易啊，期间也自己写过php cms博客系统，也用过其他博客，不过，始终觉得“作为一个程序员， Blog 这种轮子要是挂在大众博客程序上就太没意思了。一是觉得大部分 Blog 服务都太丑，二是觉得不能随便定制不好玩。”————Hux
+
+
+后面准备把以前很多笔记，经验都迁移过来，慢慢更新下去, 希望成为我心目中的极客!
