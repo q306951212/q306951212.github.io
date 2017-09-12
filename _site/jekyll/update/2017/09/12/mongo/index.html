@@ -201,8 +201,6 @@
   <p>“Yeah It’s on. ”</p>
 </blockquote>
 
-<h2 id="hello-mongodb">Hello MongoDB！</h2>
-
 <h2 id="mongodb---常见操作">MongoDB - 常见操作</h2>
 
 <h3 id="查看数据库">查看数据库</h3>
@@ -233,7 +231,7 @@
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">db</span><span class="p">.</span><span class="nf">db_name</span><span class="p">.</span><span class="nf">drop</span><span class="p">()</span></code></pre></figure>
 
-<p>###清空数据库中的集合</p>
+<h3 id="清空数据库中的集合">清空数据库中的集合</h3>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">db</span><span class="p">.</span><span class="nf">db_name</span><span class="p">.</span><span class="nf">remove</span><span class="p">()</span></code></pre></figure>
 
@@ -257,24 +255,17 @@
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">db</span><span class="p">.</span><span class="nf">db_name</span><span class="p">.</span><span class="nf">insertMany</span><span class="p">()</span></code></pre></figure>
 
-<ul>
-  <li>如果不指定”_id”字段，save方法相当于insert方法,如果指定”_id”，则会更新字段</li>
-</ul>
+<p>如果不指定”_id”字段，save方法相当于insert方法,如果指定”_id”，则会更新字段</p>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">db</span><span class="p">.</span><span class="nf">db_name</span><span class="p">.</span><span class="nf">save</span><span class="p">(</span><span class="n">document</span><span class="p">)</span></code></pre></figure>
 
 <h3 id="删">删</h3>
-<ul>
-  <li>justOne(0,1)指定是否删除一条数据,writeConcern表示抛出异常的级别</li>
-</ul>
+<p>justOne(0,1)指定是否删除一条数据,writeConcern表示抛出异常的级别</p>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">db</span><span class="p">.</span><span class="nf">db_name</span><span class="p">.</span><span class="nf">remove</span><span class="p">({</span><span class="n">query</span><span class="p">,</span><span class="n">justOne</span><span class="p">,</span><span class="n">writeConcern</span><span class="p">})</span></code></pre></figure>
 
 <h3 id="改">改</h3>
-
-<ul>
-  <li>query指定将什么文档更新,update指定更新的内容 upsert表示如果没有查询到数据,是否创建update数据,multi表示是否更新多条数据,writeConcern表示异常级别</li>
-</ul>
+<p>query指定将什么文档更新,update指定更新的内容 upsert表示如果没有查询到数据,是否创建update数据,multi表示是否更新多条数据,writeConcern表示异常级别</p>
 
 <figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">db</span><span class="p">.</span><span class="nf">db_name</span><span class="p">.</span><span class="nf">update</span><span class="p">(</span><span class="n">query</span><span class="p">,{</span><span class="vg">$set</span><span class="p">:{</span><span class="n">update</span><span class="p">}},</span><span class="n">upsert</span><span class="p">,</span><span class="n">multi</span><span class="p">,</span><span class="n">writeConcern</span><span class="p">)</span></code></pre></figure>
 
@@ -314,11 +305,11 @@
 
 <h3 id="条件语句">条件语句</h3>
 
-<p><img src="/img/ArticleImg2/where.PNG" alt="Alt text" /></p>
+<p><img src="/img/ArticleImg2/where.png" alt="Alt text" /></p>
 
 <h3 id="操作符">操作符</h3>
 
-<p><img src="/img/ArticleImg2/type.PNG" alt="Alt text" /></p>
+<p><img src="/img/ArticleImg2/type.png" alt="Alt text" /></p>
 
 <h2 id="and条件">And条件</h2>
 
@@ -366,7 +357,7 @@
   <li>每插入一条数据,都会生成一个唯一的_id索引</li>
 </ul>
 
-<p><img src="/img/ArticleImg2/index1.PNG" alt="Alt text" /></p>
+<p><img src="/img/ArticleImg2/index1.png" alt="Alt text" /></p>
 
 <ul>
   <li>v表示version</li>
@@ -377,7 +368,7 @@
 
 <h3 id="单键索引">单键索引</h3>
 
-<p><img src="/img/ArticleImg2/index2.PNG" alt="Alt text" /></p>
+<p><img src="/img/ArticleImg2/index2.png" alt="Alt text" /></p>
 
 <h3 id="多建索引">多建索引</h3>
 
@@ -385,11 +376,11 @@
   <li>单键索引的值是唯一的，多键索引有多个值</li>
 </ul>
 
-<p><img src="/img/ArticleImg2/index3.PNG" alt="Alt text" /></p>
+<p><img src="/img/ArticleImg2/index3.png" alt="Alt text" /></p>
 
 <h3 id="复合索引">复合索引</h3>
 
-<p><img src="/img/ArticleImg2/index4.PNG" alt="Alt text" /></p>
+<p><img src="/img/ArticleImg2/index4.png" alt="Alt text" /></p>
 
 <h3 id="过期索引">过期索引</h3>
 
@@ -399,7 +390,7 @@
   <li>存储在过期索引字段的值必须是指定的时间类型（必须是 ISODate 或 ISODate 数组，不能使用时间戳，否则不能被自动删除）</li>
 </ul>
 
-<p><img src="/img/ArticleImg2/index5.PNG" alt="Alt text" /></p>
+<p><img src="/img/ArticleImg2/index5.png" alt="Alt text" /></p>
 
 <h3 id="全文索引">全文索引</h3>
 
@@ -409,7 +400,7 @@
   <li>key-value 中，key 此时为 $**（也可以是具体某 key），value 此时为一个固定的字符串（如 text）</li>
 </ul>
 
-<p><img src="/img/ArticleImg2/index6.PNG" alt="Alt text" /></p>
+<p><img src="/img/ArticleImg2/index6.png" alt="Alt text" /></p>
 
 <ul>
   <li>每个集合只能创建一个全文索引</li>
@@ -420,8 +411,19 @@
 </ul>
 
 <h3 id="地理位置索引">地理位置索引</h3>
-
-<p>暂略….</p>
+<ul>
+  <li>地理位置索引分为”2d地理位置索引”和”2dsphere地理位置索引”</li>
+  <li>2d地理位置索引的参数是经度(-180,180)纬度(-90,90)
+<img src="/img/ArticleImg2/index7.png" alt="Alt text" /></li>
+  <li>通过地理位置索引可以查找附近的车或商店,查找方式有三种</li>
+  <li>$near 查找最近的位置
+<img src="/img/ArticleImg2/index8.png" alt="Alt text" /></li>
+  <li>通过geoWithin方法可以查找矩形($box),圆形($center),多边形($polygon)区域类的物体
+<img src="/img/ArticleImg2/index11.png" alt="Alt text" />
+<img src="/img/ArticleImg2/index9.png" alt="Alt text" /></li>
+  <li>通过geoNear可以比Near更加详细的查找物体
+<img src="/img/ArticleImg2/index10.png" alt="Alt text" /></li>
+</ul>
 
 
 

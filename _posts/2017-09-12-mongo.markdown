@@ -11,9 +11,6 @@ tags:
 ---
 > “Yeah It's on. ”
 
-
-## Hello MongoDB！
-
 ## MongoDB - 常见操作
 
 ### 查看数据库
@@ -51,7 +48,7 @@ db.dropDatabase()
 db.db_name.drop()
 {% endhighlight %}
 
-###清空数据库中的集合
+### 清空数据库中的集合
 {% highlight ruby %}
 db.db_name.remove()
 {% endhighlight %}
@@ -85,23 +82,20 @@ db.db_name.insertOne({document})
 {% highlight ruby %}
 db.db_name.insertMany()
 {% endhighlight %}
-
-* 如果不指定"_id"字段，save方法相当于insert方法,如果指定"_id"，则会更新字段
-
+如果不指定"_id"字段，save方法相当于insert方法,如果指定"_id"，则会更新字段
 {% highlight ruby %}
 db.db_name.save(document)
 {% endhighlight %}
 
 ### 删
-* justOne(0,1)指定是否删除一条数据,writeConcern表示抛出异常的级别
+justOne(0,1)指定是否删除一条数据,writeConcern表示抛出异常的级别
 
 {% highlight ruby %}
 db.db_name.remove({query,justOne,writeConcern})
 {% endhighlight %}
 
 ### 改
-
-* query指定将什么文档更新,update指定更新的内容 upsert表示如果没有查询到数据,是否创建update数据,multi表示是否更新多条数据,writeConcern表示异常级别
+query指定将什么文档更新,update指定更新的内容 upsert表示如果没有查询到数据,是否创建update数据,multi表示是否更新多条数据,writeConcern表示异常级别
 
 {% highlight ruby %}
 db.db_name.update(query,{$set:{update}},upsert,multi,writeConcern)
@@ -270,8 +264,21 @@ db.db_name.ensureIndex({key:value})
 * 关键词加引号表示与 （需用 \ 转义）
 
 ### 地理位置索引
+* 地理位置索引分为"2d地理位置索引"和"2dsphere地理位置索引"
+* 2d地理位置索引的参数是经度(-180,180)纬度(-90,90)
+![Alt text](/img/ArticleImg2/index7.png)
+* 通过地理位置索引可以查找附近的车或商店,查找方式有三种
+* $near 查找最近的位置
+![Alt text](/img/ArticleImg2/index8.png)
+* 通过geoWithin方法可以查找矩形($box),圆形($center),多边形($polygon)区域类的物体
+![Alt text](/img/ArticleImg2/index11.png)
+![Alt text](/img/ArticleImg2/index9.png)
+* 通过geoNear可以比Near更加详细的查找物体
+![Alt text](/img/ArticleImg2/index10.png)
 
-暂略....
+
+
+
 
 
 

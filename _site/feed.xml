@@ -5,8 +5,8 @@
     <description>我想成为我心目中的极客</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Tue, 12 Sep 2017 11:12:46 +0800</pubDate>
-    <lastBuildDate>Tue, 12 Sep 2017 11:12:46 +0800</lastBuildDate>
+    <pubDate>Tue, 12 Sep 2017 19:41:53 +0800</pubDate>
+    <lastBuildDate>Tue, 12 Sep 2017 19:41:53 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
@@ -14,8 +14,6 @@
         <description>&lt;blockquote&gt;
   &lt;p&gt;“Yeah It’s on. ”&lt;/p&gt;
 &lt;/blockquote&gt;
-
-&lt;h2 id=&quot;hello-mongodb&quot;&gt;Hello MongoDB！&lt;/h2&gt;
 
 &lt;h2 id=&quot;mongodb---常见操作&quot;&gt;MongoDB - 常见操作&lt;/h2&gt;
 
@@ -47,7 +45,7 @@
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;db_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;###清空数据库中的集合&lt;/p&gt;
+&lt;h3 id=&quot;清空数据库中的集合&quot;&gt;清空数据库中的集合&lt;/h3&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;db_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;remove&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
@@ -71,24 +69,17 @@
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;db_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;insertMany&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;如果不指定”_id”字段，save方法相当于insert方法,如果指定”_id”，则会更新字段&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;如果不指定”_id”字段，save方法相当于insert方法,如果指定”_id”，则会更新字段&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;db_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;save&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;h3 id=&quot;删&quot;&gt;删&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;justOne(0,1)指定是否删除一条数据,writeConcern表示抛出异常的级别&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;justOne(0,1)指定是否删除一条数据,writeConcern表示抛出异常的级别&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;db_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;remove&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;justOne&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;writeConcern&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;h3 id=&quot;改&quot;&gt;改&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;query指定将什么文档更新,update指定更新的内容 upsert表示如果没有查询到数据,是否创建update数据,multi表示是否更新多条数据,writeConcern表示异常级别&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;query指定将什么文档更新,update指定更新的内容 upsert表示如果没有查询到数据,是否创建update数据,multi表示是否更新多条数据,writeConcern表示异常级别&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;db_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,{&lt;/span&gt;&lt;span class=&quot;vg&quot;&gt;$set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;upsert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;multi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;writeConcern&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
@@ -128,11 +119,11 @@
 
 &lt;h3 id=&quot;条件语句&quot;&gt;条件语句&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/where.PNG&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/where.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;操作符&quot;&gt;操作符&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/type.PNG&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/type.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;and条件&quot;&gt;And条件&lt;/h2&gt;
 
@@ -180,7 +171,7 @@
   &lt;li&gt;每插入一条数据,都会生成一个唯一的_id索引&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index1.PNG&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index1.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;v表示version&lt;/li&gt;
@@ -191,7 +182,7 @@
 
 &lt;h3 id=&quot;单键索引&quot;&gt;单键索引&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index2.PNG&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index2.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;多建索引&quot;&gt;多建索引&lt;/h3&gt;
 
@@ -199,11 +190,11 @@
   &lt;li&gt;单键索引的值是唯一的，多键索引有多个值&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index3.PNG&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index3.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;复合索引&quot;&gt;复合索引&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index4.PNG&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index4.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;过期索引&quot;&gt;过期索引&lt;/h3&gt;
 
@@ -213,7 +204,7 @@
   &lt;li&gt;存储在过期索引字段的值必须是指定的时间类型（必须是 ISODate 或 ISODate 数组，不能使用时间戳，否则不能被自动删除）&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index5.PNG&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index5.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;全文索引&quot;&gt;全文索引&lt;/h3&gt;
 
@@ -223,7 +214,7 @@
   &lt;li&gt;key-value 中，key 此时为 $**（也可以是具体某 key），value 此时为一个固定的字符串（如 text）&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index6.PNG&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg2/index6.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;每个集合只能创建一个全文索引&lt;/li&gt;
@@ -234,8 +225,19 @@
 &lt;/ul&gt;
 
 &lt;h3 id=&quot;地理位置索引&quot;&gt;地理位置索引&lt;/h3&gt;
-
-&lt;p&gt;暂略….&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;地理位置索引分为”2d地理位置索引”和”2dsphere地理位置索引”&lt;/li&gt;
+  &lt;li&gt;2d地理位置索引的参数是经度(-180,180)纬度(-90,90)
+&lt;img src=&quot;/img/ArticleImg2/index7.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;通过地理位置索引可以查找附近的车或商店,查找方式有三种&lt;/li&gt;
+  &lt;li&gt;$near 查找最近的位置
+&lt;img src=&quot;/img/ArticleImg2/index8.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;通过geoWithin方法可以查找矩形($box),圆形($center),多边形($polygon)区域类的物体
+&lt;img src=&quot;/img/ArticleImg2/index11.png&quot; alt=&quot;Alt text&quot; /&gt;
+&lt;img src=&quot;/img/ArticleImg2/index9.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;通过geoNear可以比Near更加详细的查找物体
+&lt;img src=&quot;/img/ArticleImg2/index10.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 </description>
         <pubDate>Tue, 12 Sep 2017 09:03:26 +0800</pubDate>
