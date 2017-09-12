@@ -158,11 +158,11 @@ db.db_name.find().sort({"key":1})
 
 ### 条件语句
 
-![Alt text](/img/ArticleImg2/where.PNG)
+![Alt text](/img/ArticleImg2/where.png)
 
 ### 操作符
 
-![Alt text](/img/ArticleImg2/type.PNG)
+![Alt text](/img/ArticleImg2/type.png)
 
 ## And条件
 
@@ -226,7 +226,7 @@ db.db_name.ensureIndex({key:value})
 
 * 每插入一条数据,都会生成一个唯一的_id索引
 
-![Alt text](/img/ArticleImg2/index1.PNG)
+![Alt text](/img/ArticleImg2/index1.png)
 
 * v表示version
 * key表示索引的键，1表示升序,-1表示降序
@@ -235,17 +235,17 @@ db.db_name.ensureIndex({key:value})
 
 ### 单键索引
 
-![Alt text](/img/ArticleImg2/index2.PNG)
+![Alt text](/img/ArticleImg2/index2.png)
 
 ### 多建索引
 
 * 单键索引的值是唯一的，多键索引有多个值
 
-![Alt text](/img/ArticleImg2/index3.PNG)
+![Alt text](/img/ArticleImg2/index3.png)
 
 ### 复合索引
 
-![Alt text](/img/ArticleImg2/index4.PNG)
+![Alt text](/img/ArticleImg2/index4.png)
 
 ### 过期索引
 
@@ -253,7 +253,7 @@ db.db_name.ensureIndex({key:value})
 * 过期索引不能是复合索引（不能指定两个过期时间）
 * 存储在过期索引字段的值必须是指定的时间类型（必须是 ISODate 或 ISODate 数组，不能使用时间戳，否则不能被自动删除）
 
-![Alt text](/img/ArticleImg2/index5.PNG)
+![Alt text](/img/ArticleImg2/index5.png)
 
 ### 全文索引
 
@@ -261,7 +261,7 @@ db.db_name.ensureIndex({key:value})
 
 * key-value 中，key 此时为 $**（也可以是具体某 key），value 此时为一个固定的字符串（如 text）
 
-![Alt text](/img/ArticleImg2/index6.PNG)
+![Alt text](/img/ArticleImg2/index6.png)
 
 * 每个集合只能创建一个全文索引
 * MongoDB 从 2.4 版本开始支持全文检索，从 3.2 版本开始支持中文(好像）只能对整个单词查询，不能对单词的截取部分查询
