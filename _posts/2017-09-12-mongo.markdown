@@ -1,0 +1,295 @@
+---
+layout: post
+title:  "mongoDB 学习笔记!"
+date:   2017-09-12 15:03:26 +0800
+author:     "陈杨"
+header-img: "img/post-bg-2015.jpg"
+categories: jekyll update
+catalog: true
+tags:
+    - 学习
+---
+
+> “Yeah It's on. ”
+
+
+## Hello MongoDB！
+
+## MongoDB - 常见操作
+
+### 查看数据库
+{% highlight ruby %}
+show dbs
+{% endhighlight %}
+
+### 查看当前数据库
+{% highlight ruby %}
+db
+{% endhighlight %}
+
+### 使用数据库
+{% highlight ruby %}
+use db_name
+{% endhighlight %}
+
+### 查看服务器状态
+{% highlight ruby %}
+db.serverStatus()
+{% endhighlight %}
+
+### 数据库状态信息
+{% highlight ruby %}
+db.stats()
+{% endhighlight %}
+
+### 删除数据库
+{% highlight ruby %}
+db.dropDatabase()
+{% endhighlight %}
+
+### 删除数据库中的集合
+{% highlight ruby %}
+db.db_name.drop()
+{% endhighlight %}
+
+###清空数据库中的集合
+{% highlight ruby %}
+db.db_name.remove()
+{% endhighlight %}
+
+### 查看数据库中的集合
+{% highlight ruby %}
+show collections()
+{% endhighlight %}
+
+{% highlight ruby %}
+show tables
+{% endhighlight %}
+
+### 查看文档详细信息
+
+{% highlight ruby %}
+db.db_name.find({key:value}).explain()
+{% endhighlight %}
+
+## MongoDB - 增删改查
+
+### 增
+{% highlight ruby %}
+db.db_name.insert({document})
+{% endhighlight %}
+
+{% highlight ruby %}
+db.db_name.insertOne({document})
+{% endhighlight %}
+
+{% highlight ruby %}
+db.db_name.insertMany({[document],[document]})
+{% endhighlight %}
+
+* 如果不指定"_id"字段，save方法相当于insert方法,如果指定"_id"，则会更新字段
+
+{% highlight ruby %}
+db.db_name.save(document)
+{% endhighlight %}
+
+### 删
+
+* query指定删除的文档，justOne(0,1)指定是否删除一条数据,writeConcern表示抛出异常的级别
+
+{% highlight ruby %}
+db.db_name.remove({query,justOne,writeConcern})
+{% endhighlight %}
+
+### 改
+
+* query指定将什么文档更新,update指定更新的内容 upsert表示如果没有查询到数据,是否创建update数据,multi表示是否更新多条数据,writeConcern表示异常级别
+
+{% highlight ruby %}
+db.db_name.update({{query},{$set:{update}},upsert,multi,writeConcern})
+{% endhighlight %}
+
+### 查
+
+查找所有数据
+
+{% highlight ruby %}
+db.db_name.find()
+{% endhighlight %}
+
+查找一条数据
+
+{% highlight ruby %}
+db.db_name.findOne()
+{% endhighlight %}
+
+格式化输出
+
+{% highlight ruby %}
+db.db_name.find().pretty()
+{% endhighlight %}
+
+输出文档的集合
+
+{% highlight ruby %}
+db.db_name.find().count()
+{% endhighlight %}
+
+跳过多少条数据
+
+{% highlight ruby %}
+db.db_name.find().skip()
+{% endhighlight %}
+
+输出多少条数据
+
+{% highlight ruby %}
+db.db_name.find().limit()
+{% endhighlight %}
+
+排序
+
+* sort表示排序,1表示升序，-1表示降序
+
+{% highlight ruby %}
+db.db_name.find().sort({"key":1})
+{% endhighlight %}
+
+### 条件语句
+
+![Alt text](/img/ArticleImg2/where.PNG)
+
+### 操作符
+
+![Alt text](/img/ArticleImg2/type.PNG)
+
+## And条件
+
+{% highlight ruby %}
+db.db_name.find({key:value,key:value}).pretty()
+{% endhighlight %}
+
+## Or条件
+
+{% highlight ruby %}
+db.db_name.find({$or: [{key:value},{key:value}]})
+{% endhighlight %}
+
+### And 和 Or 联合使用
+
+{% highlight ruby %}
+db.db_name.find({key:value},$or: [{key:value},{key:value}])
+{% endhighlight %}
+
+## MongoDb索引
+
+索引能够极大的提高查询的效率,如果没有索引，MongoDB在查询数据的时候则会全表查询，索引是特殊的数据结构，索引存储在一个易于遍历读取的数据集合中，索引是对数据库表中一列或多列的值进行排序的一种结构
+
+### 索引常用命令
+
+查看索引
+
+{% highlight ruby %}
+db.db_name.getIndexes()
+{% endhighlight %}
+
+强制使用索引(hint)
+
+{% highlight ruby %}
+db.db_name.find({"age":{$lt:10}}).hint({name:1,age:1}).explain()
+{% endhighlight %}
+
+删除索引(不会删除_id索引)
+
+{% highlight ruby %}
+db.db_name.dropIndexes()
+{% endhighlight %}
+
+{% highlight ruby %}
+db.db_name.dropIndex({query})
+{% endhighlight %}
+
+创建索引
+
+{% highlight ruby %}
+db.db_name.createIndex({key:value})
+{% endhighlight %}
+
+{% highlight ruby %}
+db.db_name.ensureIndex({key:value})
+{% endhighlight %}
+
+## 索引的分类
+
+###  _id索引
+
+* 每插入一条数据,都会生成一个唯一的_id索引
+
+![Alt text](/img/ArticleImg2/index1.PNG)
+
+* v表示version
+* key表示索引的键，1表示升序,-1表示降序
+* name表示索引的名臣,默认生成名称的规则是作为索引的字段_排序模式
+* ns表示namespace 命名空间,由数据库.集合名称组成
+
+### 单键索引
+
+![Alt text](/img/ArticleImg2/index2.PNG)
+
+### 多建索引
+
+* 单键索引的值是唯一的，多键索引有多个值
+
+![Alt text](/img/ArticleImg2/index3.PNG)
+
+### 复合索引
+
+![Alt text](/img/ArticleImg2/index4.PNG)
+
+### 过期索引
+
+* 又称TTL(Time To Live,生存时间),即过一段时间会连同文档消失
+* 过期索引不能是复合索引（不能指定两个过期时间）
+* 存储在过期索引字段的值必须是指定的时间类型（必须是 ISODate 或 ISODate 数组，不能使用时间戳，否则不能被自动删除）
+
+![Alt text](/img/ArticleImg2/index5.PNG)
+
+### 全文索引
+
+场景:全网站关键词搜索
+
+* key-value 中，key 此时为 $**（也可以是具体某 key），value 此时为一个固定的字符串（如 text）
+
+![Alt text](/img/ArticleImg2/index6.PNG)
+
+* 每个集合只能创建一个全文索引
+* MongoDB 从 2.4 版本开始支持全文检索，从 3.2 版本开始支持中文(好像）只能对整个单词查询，不能对单词的截取部分查询
+* 关键词之间的空格表示或
+* 关键词之前的 - 表示非
+* 关键词加引号表示与 （需用 \ 转义）
+
+### 地理位置索引
+
+暂略....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
