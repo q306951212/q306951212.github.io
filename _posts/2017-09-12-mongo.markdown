@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "mongoDB 学习笔记!"
-date:   2017-09-12 15:03:26 +0800
+title:  "Mongo 学习笔记"
+date:   2017-09-12 09:03:26 +0800
 author:     "陈杨"
 header-img: "img/post-bg-2015.jpg"
 categories: jekyll update
@@ -9,7 +9,6 @@ catalog: true
 tags:
     - 学习
 ---
-
 > “Yeah It's on. ”
 
 
@@ -72,7 +71,7 @@ show tables
 db.db_name.find({key:value}).explain()
 {% endhighlight %}
 
-## MongoDB - 增删改查
+# MongoDB - 增删改查
 
 ### 增
 {% highlight ruby %}
@@ -84,7 +83,7 @@ db.db_name.insertOne({document})
 {% endhighlight %}
 
 {% highlight ruby %}
-db.db_name.insertMany({[document],[document]})
+db.db_name.insertMany()
 {% endhighlight %}
 
 * 如果不指定"_id"字段，save方法相当于insert方法,如果指定"_id"，则会更新字段
@@ -94,8 +93,7 @@ db.db_name.save(document)
 {% endhighlight %}
 
 ### 删
-
-* query指定删除的文档，justOne(0,1)指定是否删除一条数据,writeConcern表示抛出异常的级别
+* justOne(0,1)指定是否删除一条数据,writeConcern表示抛出异常的级别
 
 {% highlight ruby %}
 db.db_name.remove({query,justOne,writeConcern})
@@ -106,8 +104,10 @@ db.db_name.remove({query,justOne,writeConcern})
 * query指定将什么文档更新,update指定更新的内容 upsert表示如果没有查询到数据,是否创建update数据,multi表示是否更新多条数据,writeConcern表示异常级别
 
 {% highlight ruby %}
-db.db_name.update({{query},{$set:{update}},upsert,multi,writeConcern})
+db.db_name.update(query,{$set:{update}},upsert,multi,writeConcern)
 {% endhighlight %}
+
+
 
 ### 查
 
@@ -154,6 +154,7 @@ db.db_name.find().limit()
 {% highlight ruby %}
 db.db_name.find().sort({"key":1})
 {% endhighlight %}
+
 
 ### 条件语句
 
@@ -271,6 +272,22 @@ db.db_name.ensureIndex({key:value})
 ### 地理位置索引
 
 暂略....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
