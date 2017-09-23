@@ -1,0 +1,177 @@
+---
+layout: post
+title:  "传统master-slave与复制集"
+date:   2017-09-22 15:03:26 +0800
+author:     "陈杨"
+header-img: "img/post-bg-2015.jpg"
+categories: jekyll update
+catalog: true
+tags:
+    - 学习
+---
+
+> “Yeah It's on. ”
+
+
+## 复制集
+
+MongoDB支持复制集，与传统的Mysql支持的Master-Slave架构相比，复制集是将数据同步在多个服务器中，复制集提供了数据的冗余备份，并在多个服务器中存储数据，
+提高了数据的可用性，并保证数据的安全，且拥有故障转移功能。
+
+## MongoDB原理
+
+mongodb的复制集至少需要两个节点，其中一个是主节点，负责客户端的请求，其余都是从节点，负责复制主节点的数据.
+
+mongodb各个节点的搭配方式为:一主一从，一主多从。
+
+主节点记录在其上的所有操作oplog，从节点定期轮询主节点获取这些操作，然后对自己的数据副本执行这些操作，从而保证从节点的数据与主节点一致。
+
+![Alt text](/img/ArticleImg4/img1.png)
+
++ 主节点:接收所有来自客户端的写操作。一个复制集只能有一个主节点。
++ 从节点:将主节点上的oplog复制过来并应用这些操作来修改其自己的数据集以确保从节点的数据集与主节点的数据集一致。一旦主节点不可用了，复制集就会将一个从节点选举成为新的主节点。客户端默认是从主节点进行读操作，但是客户端也可以通过指定 复制集读选项 来将读操作发送给从节点。
++ 投票节点:我们也可以为复制集新增一个额外的 mongod 实例作为 投票节点 。该节点中并不包含数据集，投票节点的作用仅仅是在选举过程中参与投票。当复制集的成员个数为偶数时，添加一个投票节点可以防止平局的出现，通过多数选票来选举出新的主节点。
+
+## MongoDB复制集的搭建
+
+1.准备3个虚拟机做服务器
+192.168.0.108
+
+192.168.0.106
+
+192.168.0.104
+
+2.mongoDB安装
+
+yum install wget //安装wget
+
+wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel62-3.4.3.tgz  //安装mongoDb
+
+mkdir -p /usr/local/mongodb //创建mongo安装目录
+
+mv mongodb-linux-x86_64-rhel62-3.4.3 /usr/local/mongodb  //移动解压文件到安装目录
+
+mkdir -p /data/mongodb/data 创建数据库目录
+
+mkdir -p /data/mongodb/log 创建日志目录
+
+touch /data/mongodb/log/mongodb.log 创建日志文件
+
+不推荐: /usr/local/mongodb/bin/mongod –dbpath=/data/mongodb/data –logpath= /data/mongodb/log/mongodb.log –logappend –port 27017 --fork //启动mongodb服务
+
+推荐: touch /usr/local/mongodb/mongodb.conf //创建配置文件
+
+3.修改配置,在mongodb.conf增加replSet配置，再启动服务
+
+![Alt text](/img/ArticleImg4/img2.png)
+
+**三个服务器的mongodb.conf中都需要加入replSet的指定，它们都属于repl1复制集**
+
+**replSet中的S一定要大写!**
+
+4.初始化复制集
+
+登入任意一台机器的mongodb执行，因为是全新的复制集，所以可以任意进入一台执行；要是一台有数据，则需要在有数据上执行；要多台有数据则不能初始化。
+
+![Alt text](/img/ArticleImg4/img3.png)
+
+**rs.initiate({_id:'repl1',members:[{_id:1,host:'192.168.0.108:27017'}]})**
+
++ _id:复制集的名称
++ members:复制集服务器列表
++ _id:服务器唯一ID
++ host:主机
+
+**我们操作的是192.168.0.108服务器，其中repl1即是复制集名称，和mongodb.conf中保持一致，初始化复制集的第一个服务器将会成为主复制集**
+
+![Alt text](/img/ArticleImg4/img4.png)
+
+**通过rs.status()查看复制集状态可以看到，192.168.168.129:27017已被自动分配为primary主复制集了**
+
+5.由主复制集添加从复制集
+
+![Alt text](/img/ArticleImg4/img5.png)
+
+![Alt text](/img/ArticleImg4/img6.png)
+
+**rs.add('192.168.0.106:27017')，增加192.168.0.106为从节点，第一次执行add时报了一个错，这个错说的是找不到192.168.0.106服务，是因为防火墙的原因，我们把防火墙关掉（service iptables stop），当第二次执行add的时候就成功了。**
+
+6.由主复制集添加投票节点
+
+![Alt text](/img/ArticleImg4/img7.png)
+
+![Alt text](/img/ArticleImg4/img8.png)
+
+**rs.addArb('192.168.0.104:27017')**
+
+## 测试复制集Secondary节点数据复制功能
+
+![Alt text](/img/ArticleImg4/img9.png)
+
+1.查看Secondary数据是否同步
+
+![Alt text](/img/ArticleImg4/img10.png)
+
+"errmsg" : "not master and slaveOk=false",因为secondary是不允许读取的，如果非要解决，则执行：**rs.slaveOk()**
+
+2.查看Arbiter数据是否同步
+
+![Alt text](/img/ArticleImg4/img11.png)
+
+**我们可以看到，arbiter并没有进行数据同步，因为仲裁节点只参与投票，不接收数据！**
+
+### 测试复制集是否有故障转移功能
+
+![Alt text](/img/ArticleImg4/img12.png)
+
+关闭PRIMARY,查看rs.status(),SECONDARY是否能够自动升级为PRIMARY(具有自动故障转移功能).我们可以看到192.168.0.106：27017从secondary变成了primary，故障转移成功！
+
+![Alt text](/img/ArticleImg4/img13.png)
+
+不过现在这个复制集已没有可以同步数据的从节点了，但我们可以把192.168.0.108:27017重新启动，这时108会变成secondary，这样这个复制集就可以正常工作了。
+
+![Alt text](/img/ArticleImg4/img14.png)
+
+### 复制集常用方法
+
+{% highlight ruby %}
+rs.initate():初始化复制集，第一个节点为主节点.
+
+rs.reconfig():重新加载配置文件
+
+rs.reconfig({_id:'repl1',members:[{_id:1,host:'192.168.0.106:27017'}]},{force:true})当只剩下一个secondary节点时，复制集变得不可用，则可以指定force属性强制将节点变成primary，然后再添加secondary节点
+
+rs.status()：查看复制集状态
+
+rs.printSlaveReplicationInfo():查看从复制结信息
+
+rs.slaveOk():让当前SECONDARY可读
+
+rs.add():增加复制集节点
+
+rs.remove():删除节点
+
+rs.addArb():增加仲裁节点.
+{% endhighlight %}
+
+
+## Mysql的主从结构(master-slave)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

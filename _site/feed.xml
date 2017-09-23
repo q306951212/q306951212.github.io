@@ -5,9 +5,259 @@
     <description>我想成为我心目中的极客</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Tue, 12 Sep 2017 19:41:53 +0800</pubDate>
-    <lastBuildDate>Tue, 12 Sep 2017 19:41:53 +0800</lastBuildDate>
+    <pubDate>Sat, 23 Sep 2017 11:50:33 +0800</pubDate>
+    <lastBuildDate>Sat, 23 Sep 2017 11:50:33 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>浅谈mysql事务与锁机制!</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;“Yeah It’s on. ”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;什么是事务&quot;&gt;什么是事务&lt;/h2&gt;
+
+&lt;p&gt;一个事务是一个连续一组的的数据库操作，就好像它是一个单一的工作单元，一个事物中的一系列操作要么全部成功，要么一个都不做。&lt;/p&gt;
+
+&lt;h2 id=&quot;事务的acid&quot;&gt;事务的ACID&lt;/h2&gt;
+
+&lt;p&gt;事务具有四个特性:原子性（ Atomicity ）、一致性（ Consistency ）、隔离性（ Isolation ）和持续性（ Durability ）。这四个特性简称为 ACID 特性.&lt;/p&gt;
+&lt;h3 id=&quot;原子性&quot;&gt;原子性:&lt;/h3&gt;
+
+&lt;p&gt;原子性是指事务所包含的操作要么全部成功，要么全部回滚,因此事务的操作如果成功就必须要完全应用到数据库，如果操作失败则不能对数据库有任何影响。&lt;/p&gt;
+&lt;h3 id=&quot;一致性&quot;&gt;一致性:&lt;/h3&gt;
+
+&lt;p&gt;一致性是指事务必须使数据库从一个一致性状态变换到另一个一致性状态，也就是说一个事务执行之前和执行之后都必须处于一致性状态。&lt;/p&gt;
+
+&lt;p&gt;例子1:　拿转账来说，假设用户A和用户B两者的钱加起来一共是5000，那么不管A和B之间如何转账，转几次账，事务结束后两个用户的钱相加起来应该还得是5000，这就是事务的一致性。&lt;/p&gt;
+
+&lt;p&gt;例子2:上述例子中A转账500给B,执行事务A-500,B+500，如果事务没有完成，只执行A-500，那么就不满足一致性!&lt;/p&gt;
+
+&lt;p&gt;总结:数据库中的数据是经常处于不一致的状态，这是不可避免的，因此我们提出了事务的概念，用于检测数据库中的数据是否处于一致性状态——如果数据库中有没有执行完的事务，那就是不一致的，否则，就是一致的。&lt;/p&gt;
+
+&lt;h3 id=&quot;隔离性&quot;&gt;隔离性:&lt;/h3&gt;
+
+&lt;p&gt;一个事务的执行不能被其它事务干扰。即一个事务内部的操作及使用的数据对其它并发事务是隔离的，并发执行的各个事务之间不能互相干扰。&lt;/p&gt;
+
+&lt;h3 id=&quot;持久性&quot;&gt;持久性:&lt;/h3&gt;
+
+&lt;p&gt;也称永久性，指一个事务一旦提交，它对数据库中的数据的改变就应该是永久性的,在提交之前如果系统故障，则所有信息全部丢失。提交之后数据存放在磁盘中，是永久性的。&lt;/p&gt;
+
+&lt;h3 id=&quot;什么是脏数据&quot;&gt;什么是脏数据&lt;/h3&gt;
+
+&lt;p&gt;在数据库中脏数据在临时更新中产生。&lt;/p&gt;
+
+&lt;p&gt;事务A更新了某个数据项X，但是由于某种原因，事务A出现了问题，于是要把A回滚。但是在回滚之前，另一个事务B读取了数据项X的值(A更新后)，A回滚了事务，数据项恢复了原值。事务B读取的就是数据项X的就是一个“临时”的值，就是脏数据，依据脏数据所做的操作可能是不正确的！&lt;/p&gt;
+
+&lt;h2 id=&quot;什么是锁&quot;&gt;什么是锁&lt;/h2&gt;
+
+&lt;p&gt;锁是解决事务的隔离性的一种机制，事务的隔离级别通过锁来实现。总的来说MYSQL各存储引擎使用三种类型的锁机制：行级锁定，页级锁定，表级锁定。&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;行级锁:引擎(INNODB),单独一行记录加锁&lt;/li&gt;
+  &lt;li&gt;页级锁:引擎(BDB)&lt;/li&gt;
+  &lt;li&gt;表级锁:引擎(MyISAM),锁住整张表,可以同时读，不能写&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;行级锁&quot;&gt;行级锁&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;共享锁(读锁):用于锁定读取的数据资源,它是非独占的，允许其他事务同时读取锁定的资源。&lt;/li&gt;
+  &lt;li&gt;排它锁(独占锁):适用于修改数据的场合,它锁定的资源其他事物不能读取。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;当第一个事务访问某种数据库资源时，如果执行SELECT,必须先获得共享锁，如果执行INSERT,UPDATE,DELETE,必先获得排他锁。&lt;/p&gt;
+
+&lt;p&gt;当第二个事务也要访问相同的资源时，如果执行select语句，也必须先获得共享锁，如果执行insert、update或delete语句，也必须获得独占锁。此时根据已经旋转在资源上的锁的类型，来决定第二个事务应该等待第一个事务解除对应资源的锁定，还是可以立刻获得锁。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg3/img1.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;###悲观锁和乐观锁&lt;/p&gt;
+
+&lt;p&gt;悲观锁(Pessimistic Lock),顾名思义,就是很悲观，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会block(阻塞)直到它拿到锁。
+传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁。&lt;/p&gt;
+
+&lt;p&gt;乐观锁(Optimistic Lock), 顾名思义，就是很乐观，每次去拿数据的时候都认为别人不会修改，所以不会上锁。
+但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，表中有个版本号字段,通过版本号去查看是否更新，如果没有相同则跟新，否则不跟新。
+乐观锁适用于多读的应用类型。&lt;/p&gt;
+
+</description>
+        <pubDate>Fri, 22 Sep 2017 15:03:26 +0800</pubDate>
+        <link>http://localhost:4000/jekyll/update/2017/09/22/clock/</link>
+        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2017/09/22/clock/</guid>
+        
+        <category>学习</category>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>传统master-slave与复制集</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;“Yeah It’s on. ”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;复制集&quot;&gt;复制集&lt;/h2&gt;
+
+&lt;p&gt;MongoDB支持复制集，与传统的Mysql支持的Master-Slave架构相比，复制集是将数据同步在多个服务器中，复制集提供了数据的冗余备份，并在多个服务器中存储数据，
+提高了数据的可用性，并保证数据的安全，且拥有故障转移功能。&lt;/p&gt;
+
+&lt;h2 id=&quot;mongodb原理&quot;&gt;MongoDB原理&lt;/h2&gt;
+
+&lt;p&gt;mongodb的复制集至少需要两个节点，其中一个是主节点，负责客户端的请求，其余都是从节点，负责复制主节点的数据.&lt;/p&gt;
+
+&lt;p&gt;mongodb各个节点的搭配方式为:一主一从，一主多从。&lt;/p&gt;
+
+&lt;p&gt;主节点记录在其上的所有操作oplog，从节点定期轮询主节点获取这些操作，然后对自己的数据副本执行这些操作，从而保证从节点的数据与主节点一致。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img1.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;主节点:接收所有来自客户端的写操作。一个复制集只能有一个主节点。&lt;/li&gt;
+  &lt;li&gt;从节点:将主节点上的oplog复制过来并应用这些操作来修改其自己的数据集以确保从节点的数据集与主节点的数据集一致。一旦主节点不可用了，复制集就会将一个从节点选举成为新的主节点。客户端默认是从主节点进行读操作，但是客户端也可以通过指定 复制集读选项 来将读操作发送给从节点。&lt;/li&gt;
+  &lt;li&gt;投票节点:我们也可以为复制集新增一个额外的 mongod 实例作为 投票节点 。该节点中并不包含数据集，投票节点的作用仅仅是在选举过程中参与投票。当复制集的成员个数为偶数时，添加一个投票节点可以防止平局的出现，通过多数选票来选举出新的主节点。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;mongodb复制集的搭建&quot;&gt;MongoDB复制集的搭建&lt;/h2&gt;
+
+&lt;p&gt;1.准备3个虚拟机做服务器
+192.168.0.108&lt;/p&gt;
+
+&lt;p&gt;192.168.0.106&lt;/p&gt;
+
+&lt;p&gt;192.168.0.104&lt;/p&gt;
+
+&lt;p&gt;2.mongoDB安装&lt;/p&gt;
+
+&lt;p&gt;yum install wget //安装wget&lt;/p&gt;
+
+&lt;p&gt;wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel62-3.4.3.tgz  //安装mongoDb&lt;/p&gt;
+
+&lt;p&gt;mkdir -p /usr/local/mongodb //创建mongo安装目录&lt;/p&gt;
+
+&lt;p&gt;mv mongodb-linux-x86_64-rhel62-3.4.3 /usr/local/mongodb  //移动解压文件到安装目录&lt;/p&gt;
+
+&lt;p&gt;mkdir -p /data/mongodb/data 创建数据库目录&lt;/p&gt;
+
+&lt;p&gt;mkdir -p /data/mongodb/log 创建日志目录&lt;/p&gt;
+
+&lt;p&gt;touch /data/mongodb/log/mongodb.log 创建日志文件&lt;/p&gt;
+
+&lt;p&gt;不推荐: /usr/local/mongodb/bin/mongod –dbpath=/data/mongodb/data –logpath= /data/mongodb/log/mongodb.log –logappend –port 27017 –fork //启动mongodb服务&lt;/p&gt;
+
+&lt;p&gt;推荐: touch /usr/local/mongodb/mongodb.conf //创建配置文件&lt;/p&gt;
+
+&lt;p&gt;3.修改配置,在mongodb.conf增加replSet配置，再启动服务&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img2.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;三个服务器的mongodb.conf中都需要加入replSet的指定，它们都属于repl1复制集&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;replSet中的S一定要大写!&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;4.初始化复制集&lt;/p&gt;
+
+&lt;p&gt;登入任意一台机器的mongodb执行，因为是全新的复制集，所以可以任意进入一台执行；要是一台有数据，则需要在有数据上执行；要多台有数据则不能初始化。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img3.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;rs.initiate({_id:’repl1’,members:[{_id:1,host:’192.168.0.108:27017’}]})&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;_id:复制集的名称&lt;/li&gt;
+  &lt;li&gt;members:复制集服务器列表&lt;/li&gt;
+  &lt;li&gt;_id:服务器唯一ID&lt;/li&gt;
+  &lt;li&gt;host:主机&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;我们操作的是192.168.0.108服务器，其中repl1即是复制集名称，和mongodb.conf中保持一致，初始化复制集的第一个服务器将会成为主复制集&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img4.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;通过rs.status()查看复制集状态可以看到，192.168.168.129:27017已被自动分配为primary主复制集了&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;5.由主复制集添加从复制集&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img5.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img6.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;rs.add(‘192.168.0.106:27017’)，增加192.168.0.106为从节点，第一次执行add时报了一个错，这个错说的是找不到192.168.0.106服务，是因为防火墙的原因，我们把防火墙关掉（service iptables stop），当第二次执行add的时候就成功了。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;6.由主复制集添加投票节点&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img7.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img8.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;rs.addArb(‘192.168.0.104:27017’)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;测试复制集secondary节点数据复制功能&quot;&gt;测试复制集Secondary节点数据复制功能&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img9.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;1.查看Secondary数据是否同步&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img10.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;“errmsg” : “not master and slaveOk=false”,因为secondary是不允许读取的，如果非要解决，则执行：&lt;strong&gt;rs.slaveOk()&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;2.查看Arbiter数据是否同步&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img11.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;我们可以看到，arbiter并没有进行数据同步，因为仲裁节点只参与投票，不接收数据！&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;测试复制集是否有故障转移功能&quot;&gt;测试复制集是否有故障转移功能&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img12.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;关闭PRIMARY,查看rs.status(),SECONDARY是否能够自动升级为PRIMARY(具有自动故障转移功能).我们可以看到192.168.0.106：27017从secondary变成了primary，故障转移成功！&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img13.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;不过现在这个复制集已没有可以同步数据的从节点了，但我们可以把192.168.0.108:27017重新启动，这时108会变成secondary，这样这个复制集就可以正常工作了。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img14.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;复制集常用方法&quot;&gt;复制集常用方法&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;initate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;初始化复制集，第一个节点为主节点&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+
+&lt;span class=&quot;nf&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;reconfig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;重新加载配置文件&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;reconfig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_id&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:'repl1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;members&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:[{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:'192.168.0.106:27017'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}]},{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;force&lt;/span&gt;&lt;span class=&quot;ss&quot;&gt;:true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;当只剩下一个&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secondary&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;节点时，复制集变得不可用，则可以指定&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;force&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;属性强制将节点变成&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;primary&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;，然后再添加&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secondary&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;节点&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;：查看复制集状态&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;printSlaveReplicationInfo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;查看从复制结信息&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;slaveOk&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;让当前&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;SECONDARY&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;可读&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;增加复制集节点&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;remove&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;删除节点&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;addArb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;增加仲裁节点&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;mysql的主从结构master-slave&quot;&gt;Mysql的主从结构(master-slave)&lt;/h2&gt;
+
+</description>
+        <pubDate>Fri, 22 Sep 2017 15:03:26 +0800</pubDate>
+        <link>http://localhost:4000/jekyll/update/2017/09/22/replSet/</link>
+        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2017/09/22/replSet/</guid>
+        
+        <category>学习</category>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
     
       <item>
         <title>Mongo 学习笔记</title>

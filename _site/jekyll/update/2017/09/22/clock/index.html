@@ -11,7 +11,7 @@
     <meta name="keywords"  content="陈杨, chenyang, cy, white, 其实我也不想哭, @chenyang, 陈杨的博客, CY Blog, 博客, 个人网站, 互联网">
     <meta name="theme-color" content="#000000">
     
-    <title>陈杨的博客 | ChenYang Blog</title>
+    <title>浅谈mysql事务与锁机制! - 陈杨的博客 | ChenYang Blog</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -20,7 +20,7 @@
     <link rel="shortcut icon" href="/img/bitbug_favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/">
+    <link rel="canonical" href="http://localhost:4000/jekyll/update/2017/09/22/clock/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -150,274 +150,190 @@
 </script>
 
 
-    <!-- Page Header -->
-<header class="intro-header" style="background-image: url('/img/home-bg.jpg')">
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-2015.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-2015.jpg')
+    }
+
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
-                <div class="site-heading">
-                    <h1>white</h1>
-                    <!--<hr class="small">-->
-                    <span class="subheading">我想成为我心目中的极客</span>
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#学习" title="学习">学习</a>
+                        
+                    </div>
+                    <h1>浅谈mysql事务与锁机制!</h1>
+                    
+                    
+                    <h2 class="subheading"></h2>
+                    
+                    <span class="meta">Posted by 陈杨 on September 22, 2017</span>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- Main Content -->
-<div class="container">
-	<div class="row">
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>“Yeah It’s on. ”</p>
+</blockquote>
+
+<h2 id="什么是事务">什么是事务</h2>
+
+<p>一个事务是一个连续一组的的数据库操作，就好像它是一个单一的工作单元，一个事物中的一系列操作要么全部成功，要么一个都不做。</p>
+
+<h2 id="事务的acid">事务的ACID</h2>
+
+<p>事务具有四个特性:原子性（ Atomicity ）、一致性（ Consistency ）、隔离性（ Isolation ）和持续性（ Durability ）。这四个特性简称为 ACID 特性.</p>
+<h3 id="原子性">原子性:</h3>
+
+<p>原子性是指事务所包含的操作要么全部成功，要么全部回滚,因此事务的操作如果成功就必须要完全应用到数据库，如果操作失败则不能对数据库有任何影响。</p>
+<h3 id="一致性">一致性:</h3>
+
+<p>一致性是指事务必须使数据库从一个一致性状态变换到另一个一致性状态，也就是说一个事务执行之前和执行之后都必须处于一致性状态。</p>
+
+<p>例子1:　拿转账来说，假设用户A和用户B两者的钱加起来一共是5000，那么不管A和B之间如何转账，转几次账，事务结束后两个用户的钱相加起来应该还得是5000，这就是事务的一致性。</p>
+
+<p>例子2:上述例子中A转账500给B,执行事务A-500,B+500，如果事务没有完成，只执行A-500，那么就不满足一致性!</p>
+
+<p>总结:数据库中的数据是经常处于不一致的状态，这是不可避免的，因此我们提出了事务的概念，用于检测数据库中的数据是否处于一致性状态——如果数据库中有没有执行完的事务，那就是不一致的，否则，就是一致的。</p>
+
+<h3 id="隔离性">隔离性:</h3>
+
+<p>一个事务的执行不能被其它事务干扰。即一个事务内部的操作及使用的数据对其它并发事务是隔离的，并发执行的各个事务之间不能互相干扰。</p>
+
+<h3 id="持久性">持久性:</h3>
+
+<p>也称永久性，指一个事务一旦提交，它对数据库中的数据的改变就应该是永久性的,在提交之前如果系统故障，则所有信息全部丢失。提交之后数据存放在磁盘中，是永久性的。</p>
+
+<h3 id="什么是脏数据">什么是脏数据</h3>
+
+<p>在数据库中脏数据在临时更新中产生。</p>
+
+<p>事务A更新了某个数据项X，但是由于某种原因，事务A出现了问题，于是要把A回滚。但是在回滚之前，另一个事务B读取了数据项X的值(A更新后)，A回滚了事务，数据项恢复了原值。事务B读取的就是数据项X的就是一个“临时”的值，就是脏数据，依据脏数据所做的操作可能是不正确的！</p>
+
+<h2 id="什么是锁">什么是锁</h2>
+
+<p>锁是解决事务的隔离性的一种机制，事务的隔离级别通过锁来实现。总的来说MYSQL各存储引擎使用三种类型的锁机制：行级锁定，页级锁定，表级锁定。</p>
+<ul>
+  <li>行级锁:引擎(INNODB),单独一行记录加锁</li>
+  <li>页级锁:引擎(BDB)</li>
+  <li>表级锁:引擎(MyISAM),锁住整张表,可以同时读，不能写</li>
+</ul>
+
+<h3 id="行级锁">行级锁</h3>
+
+<ul>
+  <li>共享锁(读锁):用于锁定读取的数据资源,它是非独占的，允许其他事务同时读取锁定的资源。</li>
+  <li>排它锁(独占锁):适用于修改数据的场合,它锁定的资源其他事物不能读取。</li>
+</ul>
+
+<p>当第一个事务访问某种数据库资源时，如果执行SELECT,必须先获得共享锁，如果执行INSERT,UPDATE,DELETE,必先获得排他锁。</p>
+
+<p>当第二个事务也要访问相同的资源时，如果执行select语句，也必须先获得共享锁，如果执行insert、update或delete语句，也必须获得独占锁。此时根据已经旋转在资源上的锁的类型，来决定第二个事务应该等待第一个事务解除对应资源的锁定，还是可以立刻获得锁。</p>
+
+<p><img src="/img/ArticleImg3/img1.png" alt="Alt text" /></p>
+
+<p>###悲观锁和乐观锁</p>
+
+<p>悲观锁(Pessimistic Lock),顾名思义,就是很悲观，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会block(阻塞)直到它拿到锁。
+传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁。</p>
+
+<p>乐观锁(Optimistic Lock), 顾名思义，就是很乐观，每次去拿数据的时候都认为别人不会修改，所以不会上锁。
+但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，表中有个版本号字段,通过版本号去查看是否更新，如果没有相同则跟新，否则不跟新。
+乐观锁适用于多读的应用类型。</p>
+
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/jekyll/update/2017/09/22/replSet/" data-toggle="tooltip" data-placement="top" title="传统master-slave与复制集">
+                        Previous<br>
+                        <span>传统master-slave与复制集</span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+
+
+                
+
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
         
 
-<!-- USE SIDEBAR -->
-    <!-- PostList Container -->
-    		<div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                postlist-container
-            ">
-    			
-<div class="post-preview">
-    <a href="/jekyll/update/2017/09/22/clock/">
-        <h2 class="post-title">
-            浅谈mysql事务与锁机制!
-        </h2>
-        
-        <div class="post-content-preview">
-            
-  “Yeah It’s on. ”
-
-
-什么是事务
-
-一个事务是一个连续一组的的数据库操作，就好像它是一个单一的工作单元，一个事物中的一系列操作要么全部成功，要么一个都不做。
-
-事务的ACID
-
-事务具有四个特性:原子性（ Atomicity ）、一致性（ Consistency ）、隔离性（ Isolation ）和持续性（ Durability ）。这四个特性简称为 ACID 特性....
-        </div>
-    </a>
-    <p class="post-meta">
-        Posted by 陈杨 on September 22, 2017
-    </p>
-</div>
-<hr>
-
-<div class="post-preview">
-    <a href="/jekyll/update/2017/09/22/replSet/">
-        <h2 class="post-title">
-            传统master-slave与复制集
-        </h2>
-        
-        <div class="post-content-preview">
-            
-  “Yeah It’s on. ”
-
-
-复制集
-
-MongoDB支持复制集，与传统的Mysql支持的Master-Slave架构相比，复制集是将数据同步在多个服务器中，复制集提供了数据的冗余备份，并在多个服务器中存储数据，
-提高了数据的可用性，并保证数据的安全，且拥有故障转移功能。
-
-MongoDB原理
-
-mongodb的复制集至少需要两个节点，其中一个是主节点，负责客户端的请求，其余都...
-        </div>
-    </a>
-    <p class="post-meta">
-        Posted by 陈杨 on September 22, 2017
-    </p>
-</div>
-<hr>
-
-<div class="post-preview">
-    <a href="/jekyll/update/2017/09/12/mongo/">
-        <h2 class="post-title">
-            Mongo 学习笔记
-        </h2>
-        
-        <div class="post-content-preview">
-            
-  “Yeah It’s on. ”
-
-
-MongoDB - 常见操作
-
-查看数据库
-
-show dbs
-
-查看当前数据库
-
-db
-
-使用数据库
-
-use db_name
-
-查看服务器状态
-
-db.serverStatus()
-
-数据库状态信息
-
-db.stats()
-
-删除数据库
-
-db.dropDatabase()
-
-删除数据库中的集合
-
-db.db_name.drop()
-
-清空数据...
-        </div>
-    </a>
-    <p class="post-meta">
-        Posted by 陈杨 on September 12, 2017
-    </p>
-</div>
-<hr>
-
-<div class="post-preview">
-    <a href="/jekyll/update/2017/09/01/sqlmap/">
-        <h2 class="post-title">
-            渗透工具之sqlmap!
-        </h2>
-        
-        <div class="post-content-preview">
-            
-  “Yeah It’s on. ”
-
-
-渗透工具之sqlmap！
-
-突然发现慕课上有渗透工具sqlmap的使用，花了两天学习，现在讲知识总结下来，以便于以后查阅。
-
-sqlmap是一款非常强大的开源sql自动化注入工具，可以用来检测和利用sql注入漏洞。它由Python语言开发而成，因此运行需要安装python环境。
-
-环境
-
-python2.7.1.3 + sqlmap + DVWA
-...
-        </div>
-    </a>
-    <p class="post-meta">
-        Posted by 陈杨 on September 1, 2017
-    </p>
-</div>
-<hr>
-
-<div class="post-preview">
-    <a href="/jekyll/update/2017/08/28/hello/">
-        <h2 class="post-title">
-            Hello word 2017!
-        </h2>
-        
-        <div class="post-content-preview">
-            
-  “Yeah It’s on. ”
-
-
-Hello World！
-
-千呼万唤始出来，
-2017 年，陈杨总算有个地方可以好好写点东西了。
-
-回顾过去，从静态页面到PHP，从php到cms系统再到现在的githubPage+jekyll，从windows都不会到linux git提交，从小学，到大学，历时这么多年，现在终于有一个稳定的Blog了，真的不容易啊，期间也自己写过php cms博...
-        </div>
-    </a>
-    <p class="post-meta">
-        Posted by 陈杨 on August 28, 2017
-    </p>
-</div>
-<hr>
-
-
-<!-- Pager -->
-
-
-    		</div>
     <!-- Sidebar Container -->
             <div class="
-                col-lg-3 col-lg-offset-0
-                col-md-3 col-md-offset-0
-                col-sm-12
-                col-xs-12
-                sidebar-container
-            ">
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
                 <!-- Featured Tags -->
                 
                 <section>
                     <hr class="hidden-sm hidden-xs">
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
-                        
+        				
                             
-                        
+        				
                             
-                                <a href="/tags/#学习" title="学习" rel="4">
+                				<a href="/tags/#学习" title="学习" rel="4">
                                     学习
                                 </a>
                             
-                        
-                    </div>
+        				
+        			</div>
                 </section>
                 
 
-                <!-- Short About -->
-                <section class="visible-md visible-lg">
-                    <hr><h5><a href="/about/">ABOUT ME</a></h5>
-                    <div class="short-about">
-                        
-                            <img src="/img/avatar-hux.jpg" />
-                        
-                        
-                            <p>代码改变世界</p>
-                        
-                        <!-- SNS Link -->
-                        <ul class="list-inline">
-                            
-                            
-                            
-                            
-                            <li>
-                                <a target="_blank" href="http://weibo.com/white">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://www.facebook.com/white">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://github.com/q306951212">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                        </ul>
-                    </div>
-                </section>
                 <!-- Friends Blog -->
                 
                 <hr>
@@ -428,10 +344,52 @@ Hello World！
                     
                 </ul>
                 
-    		</div>
-        
-	</div>
-</div>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
 
 
     <!-- Footer -->
@@ -582,6 +540,50 @@ Hello World！
 
 
 <!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
 
 
 
