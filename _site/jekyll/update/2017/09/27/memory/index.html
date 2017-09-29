@@ -11,7 +11,7 @@
     <meta name="keywords"  content="陈杨, chenyang, cy, white, 其实我也不想哭, @chenyang, 陈杨的博客, CY Blog, 博客, 个人网站, 互联网">
     <meta name="theme-color" content="#000000">
     
-    <title>About - 陈杨的博客 | ChenYang Blog</title>
+    <title>memcache内存管理机制 - 陈杨的博客 | ChenYang Blog</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -20,7 +20,7 @@
     <link rel="shortcut icon" href="/img/bitbug_favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/about/">
+    <link rel="canonical" href="http://localhost:4000/jekyll/update/2017/09/27/memory/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -150,252 +150,212 @@
 </script>
 
 
-    <!-- Page Header -->
-<header class="intro-header" style="background-image: url('/img/about-bg.jpg')">
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-2015.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-2015.jpg')
+    }
+
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
-                <div class="site-heading">
-                    <h1>About</h1>
-                    <!--<hr class="small">-->
-                    <span class="subheading">我想成为我心目中的极客</span>
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#学习" title="学习">学习</a>
+                        
+                    </div>
+                    <h1>memcache内存管理机制</h1>
+                    
+                    
+                    <h2 class="subheading"></h2>
+                    
+                    <span class="meta">Posted by 陈杨 on September 27, 2017</span>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- Main Content -->
-<div class="container">
-	<div class="row">
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>“Yeah It’s on. ”</p>
+</blockquote>
+
+<h2 id="内存碎片是怎么产生的">内存碎片是怎么产生的</h2>
+
+<p>malloc/free或者new/delete大量使用后会产生内存碎片，那么内存碎片是怎么产生的呢？</p>
+
+<p>内存碎片的产生一般是由空闲的连续的空间比申请的连续空间小，导致小的连续的内存空间无法使用。</p>
+
+<p>例子：假设有100个连续的空闲内存，范围是0~99，如果第一次申请内存为10个单位，那么申请到的内存为0~9，第二次申请5个单位，那么
+第二次申请到的内存为10~14，假设我们释放第一次申请的内存，然后我们再申请20个内存单位，那么0~9空闲，10~14被占用，15~24被占用，因为刚释放的内存块无法
+满足新的请求，那么0~9就是内存碎片了，只要10~14一直被占用且申请的内存大于10，那么0~9就永远不能够被占用了，那么0~9就是内存碎片。</p>
+
+<p>如果你申请的内存大小总比上次释放的少，那么总能够申请到。</p>
+
+<h2 id="memcache内存管理">memcache内存管理</h2>
+
+<p>memcache使用slab allocator机制来进行内存的管理</p>
+
+<p>slab allocator原理:先将内存划分为多个slab class(1M)仓库，每个仓库划分为不同的chunk,每个chunks由多个相同的小块(chunk)组成,需要存储时，判断内容大小，再为其选择适合的仓库.</p>
+
+<p><img src="/img/ArticleImg5/img1.png" alt="Alt text" /></p>
+
+<h2 id="memcache如何选择trunk">memcache如何选择trunk</h2>
+
+<p><img src="/img/ArticleImg5/img2.png" alt="Alt text" /></p>
+
+<p><strong>现在有150byte内存需要存放，首先memcache会检查chunk组，找到内容大于等于150byte且绝对值最小的那个trunk.如果此时152(slab class 3)
+已经用完，此时并不会使用192byte的trunk,而是会将152里的旧数据踢掉，以备使用.</strong></p>
+
+<h2 id="固定大小的trunk带来的内存浪费">固定大小的trunk带来的内存浪费</h2>
+
+<p>由于我们使用的是slab allocator机制，每一个trunk分配的是固定的大小，我们存储的是150byte，而使用的是152byte内存，因此会造成内存的浪费，对于trunk
+空间浪费，无法解决，只能算法缓解。</p>
+
+<h2 id="trunk增长因子调优">trunk增长因子调优</h2>
+
+<p><img src="/img/ArticleImg5/img3.png" alt="Alt text" /></p>
+
+<p>memcached 在启动时会通过-f增长因子Growth Factor，在某种程度上控制slab class的大小，默认值为1.25</p>
+
+<p><strong>备注：当f=1.25 时,从输出结果来看,某些相邻的slab class 的大小比值并非为1.25,可能会觉得有些计算误差，这些误差是为了保持字节数的对齐而故意设置的。</strong></p>
+
+<h3 id="memcache删除机制-惰性失效lazy-expiration">memcache删除机制-惰性失效(lazy expiration)</h3>
+
+<p><img src="/img/ArticleImg5/img4.png" alt="Alt text" /></p>
+
+<p><strong>add key1 0 10 8</strong>
+<strong>sunshine</strong></p>
+
+<p><img src="/img/ArticleImg5/img5.png" alt="Alt text" /></p>
+
+<p><strong>get key1</strong></p>
+
+<p><img src="/img/ArticleImg5/img6.png" alt="Alt text" /></p>
+
+<p><img src="/img/ArticleImg5/img7.png" alt="Alt text" /></p>
+
+<h2 id="memcache中iru">memcache中IRU</h2>
+
+<p>memcached会优先使用已超时的记录的空间，但即使如此，也会发生追加新记录时空间不足的情况，此时就要使用名为 Least Recently Used（LRU）机制来分配空间。</p>
+
+<p>顾名思义，这是删除”最近最少使用”的记录的机制。因此，当memcached的内存空间不足时（无法从slab class 获取到新的空间时），就从最近未被使用的记录中搜索，并将其空
+间分配给新的记录。从缓存的实用角度来看，该模型十分理想。</p>
+
+<p>当mecache里面的数据空间（默认是64M）已经占满了，再继续存储数据能否存储呢？</p>
+
+<p>答:能存储，要删除过期的数据，如果都没有过期，则删除最不活跃的数据，腾出空间给后面添加数据。</p>
+
+<p>例如：以122Bytes的slab举例，当数据装满后，如果来了一个100Bytes数据，如何处理？（即使永久有效，也会被踢）</p>
+
+<p>分析：内存的管理 LRU算法 、FIFO算法</p>
+
+<h2 id="配置使用memcache存储session数据">配置使用memcache存储session数据</h2>
+
+<ul>
+  <li>在php_ini文件中找到session.save_handler=memcache; session.save_path=”tcp://127.0.0.1:11211”</li>
+  <li>在.htaccess文件下写php_value session.save_handler “memcache”
+ php_value session.save_path tcp://127.0.0.1:11211”</li>
+  <li>ini_set(“session.save_handler”,”memcache”); ini_set(“session.save_path”,”tcp://127.0.0.1:11211”);</li>
+  <li>查找数据使用get value(session_id)在服务器端获取数据</li>
+</ul>
+
+<h2 id="memcacheaddserver">memcache::addServer()</h2>
+
+<p>Memcache::addServer() 向连接池中添加一个memcache服务器，（通过Memcache::addServer() 打开的连接将会在脚本执行结束后自动关闭，也可以使用Memcache::close()进行手动关闭。）当使用这个方法时，网络连接并不会直接建立，而是到真正使用的时候才会建立。因此在大量服务器加入连接池
+时，是没有开销的，因为它们不一定会被使用。</p>
+
+<p><a href="http://php.net/manual/zh/memcache.addserver.php" title="Memcache::addServer()">Memcache::addServer()</a></p>
+
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/jekyll/update/2017/09/24/clock/" data-toggle="tooltip" data-placement="top" title="浅谈mysql事务与锁机制!">
+                        Previous<br>
+                        <span>浅谈mysql事务与锁机制!</span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+
+
+                
+
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
         
 
-<!-- USE SIDEBAR -->
-    <!-- PostList Container -->
-    		<div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                postlist-container
-            ">
-    			<!-- Language Selector -->
-<select class="sel-lang" onchange= "onLanChange(this.options[this.options.selectedIndex].value)">
-    <option value="0" selected> 中文 Chinese </option>
-    <option value="1"> 英文 English </option>
-</select>
-
-<!-- Chinese Version -->
-<div class="zh post-container">
-
-    <!--copied from markdown -->
-    <blockquote><p>写写代码，做做设计，<br>
-        成为我心目中的极客</p></blockquote>
-
-    <p>Hey，I'm <strong>ChenYang</strong>，一只小程序猿 &amp; 技术爱好者</p>
-
-
-    <p>
-        故乡：四川省绵阳市三台县<br>
-        毕业院校：成都东软学院<br>
-        专业：网络工程<br>
-        生日：1995年7月20日（农历8月15日）<br>
-        邮箱：306951212@qq.com<br>
-        主要技能：thinkphp 、 laravel 、php 、 数据库  <br>
-        额外技能：JavaScript、前端、python<br>
-        略懂技能：ps 、office全家桶
-    </p>
-
-
-    <h3>一些上线项目简介</h3>
-    <p><h4><a href="http://q306951212.github.io">GithubPage + Jekyll</a></h4>
-    主要通过githubPage + jekyll 的方式搭建我的博客系统
-    <h4><a href="#">wordpress</a></h4>
-    最早用的博客软件，但是由于庞大的数据库，不易维护等方面的原因放弃了！
-
-
-    <p>
-    <h3> 一些小经历简介  </h3>
-
-
-    <br>在刚进校时，加入了学校的"教与学联络委员会",在那里遇见了我心目中的大神级的任务（部长）,他初中开始学习编程,会做手机系统，或做windows系统,会做设计，或做网站...他
-    也算是我的启蒙老师，在他的指导下，我第一次接触到html,css等编程语言，从此踏上了编程道路。
-    <br>
-    <br>
-    <br>
-    <br>
-    <br><b>再之后是大二暑假的事了</b>
-    <br>这个暑假，我与原来的同学交流，他走的方向是c++和linux，在他的"花言巧语"中，我了解到了原来在这个世界上，除了神圣的windows系统，还有一种叫做linux的系统,这种系统
-    不需要用鼠标,只需要用键盘敲命令，再这之后我学习了linux系统，我忽然觉得我自己是那么的"无知",在此之后，之后我又迷恋上了硬件方面的知识,我拼命学习硬件参数，这使得我更加的
-    喜欢电子产品，时间飞逝，来到了下学期，在我们班大神指导下我学习了"框架"我意识到原来自己了解的知识皮毛罢了，我不想输给其他的同学，为了学得更多，我有有了上自习和独立思考的习惯
-    ，希望自己继续加油吧！！
-    <br>
-    <br>
-    <br>
-    <br>
-    <br><b>大三 </b>
-    <br>
-    放弃了很多的玩耍时间，专心开始了学习之路。电脑从windows操作系统换成了Ubuntu操作系统，走上了正真的程序猿之路。干的第一件事是重写了这个博客，但是由于某些原因放弃了！你现在看到的是第二版了，第一版是PHP+MYSQL做的，由于老得维护服务器，后面改成了现在的GITHUB PAGE页搭建博客了。
-    <br><br><br><br>
-
-
-    </p>
-
-
-    <p>最后：平时做的一些小作品和开源项目，👉 戳 <a href="https://github.com/q306951212">我的github主页</a></p>
-
-</div>
-
-
-
-
-
-
-<!-- English Version -->
-<div class="en post-container">
-    <blockquote><p>Yet another Web Developer. <br>
-        Yet another Life-long Designer.</p></blockquote>
-
-    <p>Hi, I am <strong>ChenYang(陈杨)</strong>. I'm an engineer</p>
-
-    <p>
-
-
-        Hometown: Mianyang City, Sichuan Province, Santai counties  <br>
-        Graduated from: neusoft University of Technology<br>
-        Major: Network Engineering<br>
-        Birthday: July 20, 1995 (Lunar August 15)<br>
-        E-mail: 306951212@qq.com<br>
-        Good skills: thinkphp 、 laravel 、php 、 database<br>
-        Additional skills: JavaScript、front page、python<br>
-        Skill: ps 、 Microsoft Office <br>
-
-
-    </p>
-
-
-
-
-</div>
-
-<!-- Handle Language Change -->
-<script type="text/javascript">
-    // get nodes
-    var $zh = document.querySelector(".zh");
-    var $en = document.querySelector(".en");
-    var $select = document.querySelector("select");
-    // bind hashchange event
-    window.addEventListener('hashchange', _render);
-    // handle render
-    function _render(){
-        var _hash = window.location.hash;
-        // en
-        if(_hash == "#en"){
-            $select.selectedIndex = 1;
-            $en.style.display = "block";
-            $zh.style.display = "none";
-            // zh by default
-        }else{
-            // not trigger onChange, otherwise cause a loop call.
-            $select.selectedIndex = 0;
-            $zh.style.display = "block";
-            $en.style.display = "none";
-        }
-    }
-    // handle select change
-    function onLanChange(index){
-        if(index == 0){
-            window.location.hash = "#zh"
-        }else{
-            window.location.hash = "#en"
-        }
-    }
-    // init
-    _render();
-</script>
-
-
-
-
-
-
-    		</div>
     <!-- Sidebar Container -->
             <div class="
-                col-lg-3 col-lg-offset-0
-                col-md-3 col-md-offset-0
-                col-sm-12
-                col-xs-12
-                sidebar-container
-            ">
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
                 <!-- Featured Tags -->
                 
                 <section>
                     <hr class="hidden-sm hidden-xs">
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
-                        
+        				
                             
-                        
+        				
                             
-                                <a href="/tags/#学习" title="学习" rel="5">
+                				<a href="/tags/#学习" title="学习" rel="5">
                                     学习
                                 </a>
                             
-                        
-                    </div>
+        				
+        			</div>
                 </section>
                 
 
-                <!-- Short About -->
-                <section class="visible-md visible-lg">
-                    <hr><h5><a href="/about/">ABOUT ME</a></h5>
-                    <div class="short-about">
-                        
-                            <img src="/img/avatar-hux.jpg" />
-                        
-                        
-                            <p>代码改变世界</p>
-                        
-                        <!-- SNS Link -->
-                        <ul class="list-inline">
-                            
-                            
-                            
-                            
-                            <li>
-                                <a target="_blank" href="http://weibo.com/white">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://www.facebook.com/white">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://github.com/q306951212">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                        </ul>
-                    </div>
-                </section>
                 <!-- Friends Blog -->
                 
                 <hr>
@@ -406,10 +366,52 @@
                     
                 </ul>
                 
-    		</div>
-        
-	</div>
-</div>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
 
 
     <!-- Footer -->
@@ -560,6 +562,50 @@
 
 
 <!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
 
 
 

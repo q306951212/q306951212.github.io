@@ -181,6 +181,32 @@
             ">
     			
 <div class="post-preview">
+    <a href="/jekyll/update/2017/09/27/memory/">
+        <h2 class="post-title">
+            memcache内存管理机制
+        </h2>
+        
+        <div class="post-content-preview">
+            
+  “Yeah It’s on. ”
+
+
+内存碎片是怎么产生的
+
+malloc/free或者new/delete大量使用后会产生内存碎片，那么内存碎片是怎么产生的呢？
+
+内存碎片的产生一般是由空闲的连续的空间比申请的连续空间小，导致小的连续的内存空间无法使用。
+
+例子：假设有100个连续的空闲内存，范围是0~99，如果第一次申请内存为10个单位，那么申请到的内存为0~9，第二次申请5个单位...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by 陈杨 on September 27, 2017
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
     <a href="/jekyll/update/2017/09/24/clock/">
         <h2 class="post-title">
             浅谈mysql事务与锁机制!
@@ -360,7 +386,7 @@ Hello World！
                             
                         
                             
-                                <a href="/tags/#学习" title="学习" rel="4">
+                                <a href="/tags/#学习" title="学习" rel="5">
                                     学习
                                 </a>
                             

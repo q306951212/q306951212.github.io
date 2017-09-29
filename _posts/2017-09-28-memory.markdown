@@ -1,0 +1,122 @@
+---
+layout: post
+title:  "memcache内存管理机制"
+date:   2017-09-27 13:03:26 +0800
+author:     "陈杨"
+header-img: "img/post-bg-2015.jpg"
+categories: jekyll update
+catalog: true
+tags:
+    - 学习
+---
+
+> “Yeah It's on. ”
+
+## 内存碎片是怎么产生的
+
+malloc/free或者new/delete大量使用后会产生内存碎片，那么内存碎片是怎么产生的呢？
+
+内存碎片的产生一般是由空闲的连续的空间比申请的连续空间小，导致小的连续的内存空间无法使用。
+
+例子：假设有100个连续的空闲内存，范围是0~99，如果第一次申请内存为10个单位，那么申请到的内存为0~9，第二次申请5个单位，那么
+第二次申请到的内存为10~14，假设我们释放第一次申请的内存，然后我们再申请20个内存单位，那么0~9空闲，10~14被占用，15~24被占用，因为刚释放的内存块无法
+满足新的请求，那么0~9就是内存碎片了，只要10~14一直被占用且申请的内存大于10，那么0~9就永远不能够被占用了，那么0~9就是内存碎片。
+
+如果你申请的内存大小总比上次释放的少，那么总能够申请到。
+
+## memcache内存管理
+
+memcache使用slab allocator机制来进行内存的管理
+
+slab allocator原理:先将内存划分为多个slab class(1M)仓库，每个仓库划分为不同的chunk,每个chunks由多个相同的小块(chunk)组成,需要存储时，判断内容大小，再为其选择适合的仓库.
+
+![Alt text](/img/ArticleImg5/img1.png)
+
+## memcache如何选择trunk
+
+![Alt text](/img/ArticleImg5/img2.png)
+
+**现在有150byte内存需要存放，首先memcache会检查chunk组，找到内容大于等于150byte且绝对值最小的那个trunk.如果此时152(slab class 3)
+已经用完，此时并不会使用192byte的trunk,而是会将152里的旧数据踢掉，以备使用.**
+
+## 固定大小的trunk带来的内存浪费
+
+由于我们使用的是slab allocator机制，每一个trunk分配的是固定的大小，我们存储的是150byte，而使用的是152byte内存，因此会造成内存的浪费，对于trunk
+空间浪费，无法解决，只能算法缓解。
+
+## trunk增长因子调优
+
+![Alt text](/img/ArticleImg5/img3.png)
+
+memcached 在启动时会通过-f增长因子Growth Factor，在某种程度上控制slab class的大小，默认值为1.25
+
+**备注：当f=1.25 时,从输出结果来看,某些相邻的slab class 的大小比值并非为1.25,可能会觉得有些计算误差，这些误差是为了保持字节数的对齐而故意设置的。**
+
+### memcache删除机制-惰性失效(lazy expiration)
+
+![Alt text](/img/ArticleImg5/img4.png)
+
+**add key1 0 10 8**
+**sunshine**
+
+![Alt text](/img/ArticleImg5/img5.png)
+
+**get key1**
+
+![Alt text](/img/ArticleImg5/img6.png)
+
+![Alt text](/img/ArticleImg5/img7.png)
+
+## memcache中IRU
+
+memcached会优先使用已超时的记录的空间，但即使如此，也会发生追加新记录时空间不足的情况，此时就要使用名为 Least Recently Used（LRU）机制来分配空间。
+
+顾名思义，这是删除"最近最少使用"的记录的机制。因此，当memcached的内存空间不足时（无法从slab class 获取到新的空间时），就从最近未被使用的记录中搜索，并将其空
+间分配给新的记录。从缓存的实用角度来看，该模型十分理想。
+
+当mecache里面的数据空间（默认是64M）已经占满了，再继续存储数据能否存储呢？
+
+答:能存储，要删除过期的数据，如果都没有过期，则删除最不活跃的数据，腾出空间给后面添加数据。
+
+例如：以122Bytes的slab举例，当数据装满后，如果来了一个100Bytes数据，如何处理？（即使永久有效，也会被踢）
+
+分析：内存的管理 LRU算法 、FIFO算法
+
+## 配置使用memcache存储session数据
+
+* 在php_ini文件中找到session.save_handler=memcache; session.save_path="tcp://127.0.0.1:11211"
+* 在.htaccess文件下写php_value session.save_handler "memcache"
+ php_value session.save_path tcp://127.0.0.1:11211"
+* ini_set("session.save_handler","memcache"); ini_set("session.save_path","tcp://127.0.0.1:11211");
+* 查找数据使用get value(session_id)在服务器端获取数据
+
+## memcache::addServer()
+
+Memcache::addServer() 向连接池中添加一个memcache服务器，（通过Memcache::addServer() 打开的连接将会在脚本执行结束后自动关闭，也可以使用Memcache::close()进行手动关闭。）当使用这个方法时，网络连接并不会直接建立，而是到真正使用的时候才会建立。因此在大量服务器加入连接池
+时，是没有开销的，因为它们不一定会被使用。
+
+[Memcache::addServer()](http://php.net/manual/zh/memcache.addserver.php "Memcache::addServer()")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
