@@ -5,8 +5,8 @@
     <description>我想成为我心目中的极客</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 29 Sep 2017 11:48:46 +0800</pubDate>
-    <lastBuildDate>Fri, 29 Sep 2017 11:48:46 +0800</lastBuildDate>
+    <pubDate>Fri, 29 Sep 2017 11:52:30 +0800</pubDate>
+    <lastBuildDate>Fri, 29 Sep 2017 11:52:30 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
@@ -103,9 +103,9 @@
 &lt;p&gt;&lt;a href=&quot;http://php.net/manual/zh/memcache.addserver.php&quot; title=&quot;Memcache::addServer()&quot;&gt;Memcache::addServer()&lt;/a&gt;&lt;/p&gt;
 
 </description>
-        <pubDate>Wed, 27 Sep 2017 13:03:26 +0800</pubDate>
-        <link>http://localhost:4000/jekyll/update/2017/09/27/memory/</link>
-        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2017/09/27/memory/</guid>
+        <pubDate>Fri, 29 Sep 2017 11:03:26 +0800</pubDate>
+        <link>http://localhost:4000/jekyll/update/2017/09/29/memory/</link>
+        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2017/09/29/memory/</guid>
         
         <category>学习</category>
         

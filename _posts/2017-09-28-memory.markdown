@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "memcache内存管理机制"
-date:   2017-09-27 13:03:26 +0800
+date:   2017-09-29 11:03:26 +0800
 author:     "陈杨"
 header-img: "img/post-bg-2015.jpg"
 categories: jekyll update
