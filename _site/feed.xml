@@ -5,8 +5,8 @@
     <description>我想成为我心目中的极客</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 02 Oct 2017 13:59:26 +0800</pubDate>
-    <lastBuildDate>Mon, 02 Oct 2017 13:59:26 +0800</lastBuildDate>
+    <pubDate>Mon, 02 Oct 2017 23:40:38 +0800</pubDate>
+    <lastBuildDate>Mon, 02 Oct 2017 23:40:38 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
@@ -494,6 +494,46 @@
 &lt;span class=&quot;n&quot;&gt;rs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;addArb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;增加仲裁节点&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;h2 id=&quot;mysql的主从结构master-slave&quot;&gt;Mysql的主从结构(master-slave)&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;mysql数据同步原理:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img2-1.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;MySQL之间数据复制的基础是二进制日志文件（binary log file）。一台MySQL数据库一旦启用二进制日志后，其作为master，它的数据库中所有操作都会以“事件”的方式记录在二进制日志中，其他数据库作为slave通过一个I/O线程与主服务器保持通信，并监控master的二进制日志文件的变化，如果发现master二进制日志文件发生变化，则会把变化复制到自己的中继日志中，然后slave的一个SQL线程会把相关的“事件”执行到自己的数据库中，以此实现从数据库和主数据库的一致性，也就实现了主从复制。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;1.&lt;strong&gt;准备工作&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;1.主从数据库版本最好一致&lt;/p&gt;
+
+&lt;p&gt;2.主从数据库内数据保持一致&lt;/p&gt;
+
+&lt;p&gt;主数据库：192.168.3.43 /linux&lt;/p&gt;
+
+&lt;p&gt;从数据库：192.168.3.45 /linux&lt;/p&gt;
+
+&lt;p&gt;2.&lt;strong&gt;开启二进制日志，并设置唯一ID号&lt;/strong&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;vi&lt;/span&gt; &lt;span class=&quot;sr&quot;&gt;/etc/m&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;cof&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img2-2.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img2-3.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;3.&lt;strong&gt;重启mysql服务&lt;/strong&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;sr&quot;&gt;/etc/ini&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mysql&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;restart&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;4.&lt;strong&gt;在主服务器上创建用户并授权，查看主服务器状态&lt;/strong&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;sr&quot;&gt;/usr/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mysql&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mysql&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uroot&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p199573&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img2-4.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;5.&lt;strong&gt;配置从服务器并查看状态&lt;/strong&gt;
+&lt;img src=&quot;/img/ArticleImg4/img2-5.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg4/img2-6.png&quot; alt=&quot;Alt text&quot; /&gt;
+&lt;strong&gt;如果从服务器中：Slave_IO_Running :connecting ,Slave_SQL_Running: yes则说明配置成功&lt;/strong&gt;&lt;/p&gt;
 
 </description>
         <pubDate>Fri, 22 Sep 2017 15:03:26 +0800</pubDate>

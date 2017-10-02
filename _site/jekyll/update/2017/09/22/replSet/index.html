@@ -346,6 +346,46 @@
 
 <h2 id="mysql的主从结构master-slave">Mysql的主从结构(master-slave)</h2>
 
+<p><strong>mysql数据同步原理:</strong></p>
+
+<p><img src="/img/ArticleImg4/img2-1.png" alt="Alt text" /></p>
+
+<p><strong>MySQL之间数据复制的基础是二进制日志文件（binary log file）。一台MySQL数据库一旦启用二进制日志后，其作为master，它的数据库中所有操作都会以“事件”的方式记录在二进制日志中，其他数据库作为slave通过一个I/O线程与主服务器保持通信，并监控master的二进制日志文件的变化，如果发现master二进制日志文件发生变化，则会把变化复制到自己的中继日志中，然后slave的一个SQL线程会把相关的“事件”执行到自己的数据库中，以此实现从数据库和主数据库的一致性，也就实现了主从复制。</strong></p>
+
+<p>1.<strong>准备工作</strong></p>
+
+<p>1.主从数据库版本最好一致</p>
+
+<p>2.主从数据库内数据保持一致</p>
+
+<p>主数据库：192.168.3.43 /linux</p>
+
+<p>从数据库：192.168.3.45 /linux</p>
+
+<p>2.<strong>开启二进制日志，并设置唯一ID号</strong></p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">vi</span> <span class="sr">/etc/m</span><span class="n">y</span><span class="p">.</span><span class="nf">cof</span></code></pre></figure>
+
+<p><img src="/img/ArticleImg4/img2-2.png" alt="Alt text" /></p>
+
+<p><img src="/img/ArticleImg4/img2-3.png" alt="Alt text" /></p>
+
+<p>3.<strong>重启mysql服务</strong></p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/etc/ini</span><span class="n">t</span><span class="p">.</span><span class="nf">d</span><span class="o">/</span><span class="n">mysql</span> <span class="n">restart</span></code></pre></figure>
+
+<p>4.<strong>在主服务器上创建用户并授权，查看主服务器状态</strong></p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">/usr/</span><span class="n">local</span><span class="o">/</span><span class="n">mysql</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">mysql</span> <span class="o">-</span><span class="n">uroot</span> <span class="o">-</span><span class="n">p199573</span></code></pre></figure>
+
+<p><img src="/img/ArticleImg4/img2-4.png" alt="Alt text" /></p>
+
+<p>5.<strong>配置从服务器并查看状态</strong>
+<img src="/img/ArticleImg4/img2-5.png" alt="Alt text" /></p>
+
+<p><img src="/img/ArticleImg4/img2-6.png" alt="Alt text" />
+<strong>如果从服务器中：Slave_IO_Running :connecting ,Slave_SQL_Running: yes则说明配置成功</strong></p>
+
 
 
                 <hr style="visibility: hidden;">
