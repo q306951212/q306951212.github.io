@@ -5,9 +5,113 @@
     <description>我想成为我心目中的极客</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 29 Sep 2017 11:52:30 +0800</pubDate>
-    <lastBuildDate>Fri, 29 Sep 2017 11:52:30 +0800</lastBuildDate>
+    <pubDate>Mon, 02 Oct 2017 13:59:26 +0800</pubDate>
+    <lastBuildDate>Mon, 02 Oct 2017 13:59:26 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>redis高级应用</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;“Yeah It’s on. ”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;redis高级应用&quot;&gt;redis高级应用&lt;/h2&gt;
+&lt;p&gt;Redis的安全设计是在”Redis运行在可信环境”这个前提下做出的，在生产环境运行时不能允许外界直接连接到Redis服务器上，而应该通过应用程序进行中转，运行在可信的环境中是保证Redis安全的最重要方法。&lt;/p&gt;
+&lt;h3 id=&quot;redis安全性&quot;&gt;redis安全性&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;1.为redis设置密码&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;在redis.conf中进行配置：
+&lt;img src=&quot;/img/ArticleImg6/img1.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;通过命令设置：
+&lt;img src=&quot;/img/ArticleImg6/img2.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.危险命令重命名&lt;/strong&gt;
+&lt;img src=&quot;/img/ArticleImg6/img3.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3.绑定只能本机连接&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;redis的默认配置会接受来自任何地址发送来的请求，即拥有任意公网ip地址的redis服务器都将被访问到，因此我们只允许本机访问
+&lt;img src=&quot;/img/ArticleImg6/img4.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;redis的主从复制&quot;&gt;redis的主从复制&lt;/h2&gt;
+&lt;p&gt;在从服务器上将masterIp和masterPort写在配置文件上，如果master有密码，则将密码写在masterAuth上.
+&lt;img src=&quot;/img/ArticleImg6/img5.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;info:master and slave&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg6/img9.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg6/img10.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;redis事务处理&quot;&gt;redis事务处理&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;multi开启事务，exec执行事务，discard取消事务，watch监控事务，unwatch取消监控事务&lt;/strong&gt;
+&lt;img src=&quot;/img/ArticleImg6/img6.png&quot; alt=&quot;Alt text&quot; /&gt;
+我们可以看到，与传统数据库事务回滚不同，redis不会回滚错误事务，而是继续执行&lt;/p&gt;
+
+&lt;h2 id=&quot;redis持久化方式rdbredis-database与aofappend-only-file&quot;&gt;redis持久化方式rdb（redis database）与aof(append only file)&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Snapshotting:快照是默认的持久化方式，它是将内存中的数据以快照的方式写入二进制文件中，默认的文件名是dump.rdb,可以通过配置
+自动做快照持久化方式&lt;/strong&gt;
+&lt;img src=&quot;/img/ArticleImg6/img7.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;append only file:在使用aof持久化时，redis将每一个收到的写命令都通过write函数追加到文件中appendonly.aof.当redis重启时，会重新执行
+文件中保存的命令在内存中重建数据内容。当然由于os会在内核中缓存 write做的修改，所以可能不是立即写到磁盘上&lt;/strong&gt;
+&lt;img src=&quot;/img/ArticleImg6/img8.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;redis发布与订阅&quot;&gt;redis发布与订阅&lt;/h2&gt;
+&lt;p&gt;Redis 通过 PUBLISH 、 SUBSCRIBE 和 PSUBSCRIBE 等命令实现发布和订阅功能。这些命令被广泛用于构建即时通信应用，比如网络聊天室(chatroom)和实时广播、实时提醒(比如滴滴快的等打车软件的抢单功能)等。&lt;/p&gt;
+
+&lt;p&gt;1、订阅频道命令&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;no&quot;&gt;SUBSCRIBE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;channelName&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;2、发布命令&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;no&quot;&gt;PUBLISH&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;channelName&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;3、模式订阅命令（Redis支持模式匹配订阅，*为模糊匹配符）&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;no&quot;&gt;PSUBSCRIBE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;news&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;*&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;订阅以new.开头的所有频道&lt;/p&gt;
+
+&lt;p&gt;4、取消普通订阅和模式订阅的命令 补充：取消在官方提供的连接工具中无法模拟的&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;no&quot;&gt;UNSUBSCRIBE&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;no&quot;&gt;PUNSUBSCRIBE&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;ba&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;5、查看订阅信息（Redis2.8以上版本才有的命令）&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;n&quot;&gt;pubsub&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;channels&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pattern&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;//返回当前服务器被订阅的所有频道&lt;/p&gt;
+
+&lt;h2 id=&quot;redis虚拟内存&quot;&gt;redis虚拟内存&lt;/h2&gt;
+&lt;p&gt;Redis中的虚拟内存和os中的虚拟内存不是一回事，但是其思想是一致的，就是把暂时不常用的数据从内存交换到磁盘中从而可以把宝贵的内存腾出来用于其他需要访问的数据.&lt;/p&gt;
+
+&lt;p&gt;尤其是对于redis这样的内存数据库，内存总是不够用的。除了可以将数据分割到多个redis server外。
+另外的能够提高数据库容量的办法就是使用vm把那些不经常访问的数据交换的磁盘上。&lt;/p&gt;
+
+&lt;p&gt;在配置文件中添加以下配置项，以使当前Redis服务器在启动时打开虚存功能。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/ArticleImg6/img11.png&quot; alt=&quot;Alt text&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 02 Oct 2017 11:03:26 +0800</pubDate>
+        <link>http://localhost:4000/jekyll/update/2017/10/02/redis/</link>
+        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2017/10/02/redis/</guid>
+        
+        <category>学习</category>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
     
       <item>
         <title>memcache内存管理机制</title>
@@ -104,8 +208,8 @@
 
 </description>
         <pubDate>Fri, 29 Sep 2017 11:03:26 +0800</pubDate>
-        <link>http://localhost:4000/jekyll/update/2017/09/29/memory/</link>
-        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2017/09/29/memory/</guid>
+        <link>http://localhost:4000/jekyll/update/2017/09/29/memcache/</link>
+        <guid isPermaLink="true">http://localhost:4000/jekyll/update/2017/09/29/memcache/</guid>
         
         <category>学习</category>
         
@@ -117,7 +221,7 @@
       </item>
     
       <item>
-        <title>浅谈mysql事务与锁机制!</title>
+        <title>浅谈mysql事务与锁机制</title>
         <description>&lt;blockquote&gt;
   &lt;p&gt;“Yeah It’s on. ”&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -650,7 +754,7 @@
       </item>
     
       <item>
-        <title>渗透工具之sqlmap!</title>
+        <title>渗透工具之sqlmap</title>
         <description>&lt;blockquote&gt;
   &lt;p&gt;“Yeah It’s on. ”&lt;/p&gt;
 &lt;/blockquote&gt;

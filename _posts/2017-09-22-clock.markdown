@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "浅谈mysql事务与锁机制!"
+title:  "浅谈mysql事务与锁机制"
 date:   2017-09-24 15:03:26 +0800
 author:     "陈杨"
 header-img: "img/post-bg-2015.jpg"

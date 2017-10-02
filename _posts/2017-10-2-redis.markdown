@@ -1,0 +1,148 @@
+---
+layout: post
+title:  "redis高级应用"
+date:   2017-10-2 11:03:26 +0800
+author:     "陈杨"
+header-img: "img/post-bg-2015.jpg"
+categories: jekyll update
+catalog: true
+tags:
+    - 学习
+---
+
+> “Yeah It's on. ”
+
+## redis高级应用
+Redis的安全设计是在"Redis运行在可信环境"这个前提下做出的，在生产环境运行时不能允许外界直接连接到Redis服务器上，而应该通过应用程序进行中转，运行在可信的环境中是保证Redis安全的最重要方法。
+### redis安全性
+**1.为redis设置密码**
+
+在redis.conf中进行配置：
+![Alt text](/img/ArticleImg6/img1.png)
+
+通过命令设置：
+![Alt text](/img/ArticleImg6/img2.png)
+
+**2.危险命令重命名**
+![Alt text](/img/ArticleImg6/img3.png)
+
+**3.绑定只能本机连接**
+
+redis的默认配置会接受来自任何地址发送来的请求，即拥有任意公网ip地址的redis服务器都将被访问到，因此我们只允许本机访问
+![Alt text](/img/ArticleImg6/img4.png)
+
+## redis的主从复制
+在从服务器上将masterIp和masterPort写在配置文件上，如果master有密码，则将密码写在masterAuth上.
+![Alt text](/img/ArticleImg6/img5.png)
+
+**info:master and slave**
+
+![Alt text](/img/ArticleImg6/img9.png)
+
+![Alt text](/img/ArticleImg6/img10.png)
+
+## redis事务处理
+
+__multi开启事务，exec执行事务，discard取消事务，watch监控事务，unwatch取消监控事务__
+![Alt text](/img/ArticleImg6/img6.png)
+我们可以看到，与传统数据库事务回滚不同，redis不会回滚错误事务，而是继续执行
+
+## redis持久化方式rdb（redis database）与aof(append only file)
+
+__Snapshotting:快照是默认的持久化方式，它是将内存中的数据以快照的方式写入二进制文件中，默认的文件名是dump.rdb,可以通过配置
+自动做快照持久化方式__
+![Alt text](/img/ArticleImg6/img7.png)
+
+__append only file:在使用aof持久化时，redis将每一个收到的写命令都通过write函数追加到文件中appendonly.aof.当redis重启时，会重新执行
+文件中保存的命令在内存中重建数据内容。当然由于os会在内核中缓存 write做的修改，所以可能不是立即写到磁盘上__
+![Alt text](/img/ArticleImg6/img8.png)
+
+## redis发布与订阅
+Redis 通过 PUBLISH 、 SUBSCRIBE 和 PSUBSCRIBE 等命令实现发布和订阅功能。这些命令被广泛用于构建即时通信应用，比如网络聊天室(chatroom)和实时广播、实时提醒(比如滴滴快的等打车软件的抢单功能)等。
+
+1、订阅频道命令
+
+{% highlight ruby %}
+SUBSCRIBE channelName
+{% endhighlight %}
+
+2、发布命令
+
+{% highlight ruby %}
+PUBLISH channelName message
+{% endhighlight %}
+
+3、模式订阅命令（Redis支持模式匹配订阅，*为模糊匹配符）
+
+{% highlight ruby %}
+PSUBSCRIBE news.*
+{% endhighlight %}
+
+ 订阅以new.开头的所有频道
+
+4、取消普通订阅和模式订阅的命令 补充：取消在官方提供的连接工具中无法模拟的
+
+{% highlight ruby %}
+UNSUBSCRIBE   bar
+{% endhighlight %}
+
+{% highlight ruby %}
+PUNSUBSCRIBE  ba*
+{% endhighlight %}
+
+5、查看订阅信息（Redis2.8以上版本才有的命令）
+
+{% highlight ruby %}
+pubsub channels [pattern]
+{% endhighlight %}
+
+//返回当前服务器被订阅的所有频道
+
+## redis虚拟内存
+Redis中的虚拟内存和os中的虚拟内存不是一回事，但是其思想是一致的，就是把暂时不常用的数据从内存交换到磁盘中从而可以把宝贵的内存腾出来用于其他需要访问的数据.
+
+尤其是对于redis这样的内存数据库，内存总是不够用的。除了可以将数据分割到多个redis server外。
+另外的能够提高数据库容量的办法就是使用vm把那些不经常访问的数据交换的磁盘上。
+
+在配置文件中添加以下配置项，以使当前Redis服务器在启动时打开虚存功能。
+
+![Alt text](/img/ArticleImg6/img11.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
