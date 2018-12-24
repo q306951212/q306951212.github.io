@@ -1,2 +1,2 @@
 # q306951212.github.io
-个人博客项目，博客地址http://www.whiteeeen.cn
+2018-12-24，正式维护博客
